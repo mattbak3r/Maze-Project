@@ -1,0 +1,260 @@
+/* =
+	{
+		{plyr, pass, pass, nops, nops, nops, pass, nops, nops},
+		{pass, nops, pass, nops, pass, nops, pass, pass, pass},
+		{pass, nops, pass, nops, pass, nops, nops, nops, pass},
+		{nops, pass, pass, pass, pass, pass, nops, pass, pass},
+		{nops, nops, nops, pass, nops, pass, nops, pass, nops},
+		{pass, pass, pass, pass, nops, pass, pass, pass, pass},
+		{pass, nops, nops, nops, pass, nops, nops, nops, nops},
+		{pass, pass, pass, pass, pass, nops, pass, pass, pass},
+		{nops, pass, nops, nops, pass, pass, pass, nops, end}
+	}; */
+
+
+
+try //to move up
+			{
+				if (isPassable(Find_POS(path_value - 9)))
+				{
+					temp = Move_UP(temp);
+					path_value -= 9;
+					path.pop();
+					path.push(temp);
+					path_taken[path_value] = false;
+					cout << "Advancing UP.." << endl;
+				}
+				else
+				{
+					cout << "Move UP Not possible" << endl;
+				}
+			}
+			catch (exception x)
+			{
+				cout << "Can't move UP...something is wrong..." << endl;
+			}
+			try  //to move right
+			{
+				if (isPassable(Find_POS(path_value + 1)))
+				{
+					temp = Move_RIGHT(temp);
+					path_value += 1;
+					path.pop();
+					path.push(temp);
+					path_taken[path_value] = false;
+					cout << "Advancing RIGHT.." << endl;
+				}
+				else
+				{
+					cout << "Move Right Not possible..." << endl;
+				}
+			}
+			catch (exception x)
+			{
+				cout << "Can't move RIGHT... something is wrong.." << endl;
+			}
+			try  //to move down
+			{
+				if (isPassable(Find_POS(path_value + 9)))
+				{
+					temp = Move_DOWN(temp);
+					path_value += 9;
+					path.pop();
+					path.push(temp);
+					path_taken[path_value] = false;
+					cout << "Advancing DOWN.." << endl;
+				}
+				else
+				{
+					cout << "Move DOWN Not possible..." << endl;
+				}
+			}
+			catch (exception x)
+			{
+				cout << "Can't move DOWN... something is wrong.." << endl;
+			}
+			try //to move left
+			{
+				if (isPassable(Find_POS(path_value - 1)))
+				{
+					temp = Move_RIGHT(temp);
+					path_value -= 1;
+					path.pop();
+					path.push(temp);
+					path_taken[path_value] = false;
+					cout << "Advancing LEFT.." << endl;
+				}
+				else
+				{
+					cout << "Move LEFT Not possible... something is wrong.." << endl;
+				}
+			}
+			catch (exception x)
+			{
+				cout << "Can't move LEFT... something is wrong.." << endl;
+			}
+
+
+
+13
+14
+15
+19
+24
+26
+28
+30
+31
+32
+35
+37
+39
+43
+47
+48
+49
+50
+51
+53
+54
+60
+62
+64
+68
+69
+70
+71
+73
+74
+75
+76
+79
+83
+90
+91
+92
+93
+94
+96
+97
+98
+102
+105
+106
+107
+109
+
+/*
+	//Prints the game
+	for (int x = 0; x < 9; x++)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			cout << "\n";
+			for (int j = 0; j < 3; j++)
+			{
+				cout << game[x][0]->Print(i, j) << " ";
+			}
+			for (int k = 0; k < 3; k++)
+			{
+				cout << game[x][1]->Print(i, k) << " ";
+			}
+			for (int q = 0; q < 3; q++)
+			{
+				cout << game[x][2]->Print(i, q) << " ";
+			}
+			for (int h = 0; h < 3; h++)
+			{
+				cout << game[x][3]->Print(i, h) << " ";
+			}  
+			for (int j = 0; j < 3; j++)
+			{
+				cout << game[x][4]->Print(i, j) << " ";
+			}
+			for (int k = 0; k < 3; k++)
+			{
+				cout << game[x][5]->Print(i, k) << " ";
+			}
+			for (int h = 0; h < 3; h++)
+			{
+				cout << game[x][6]->Print(i, h) << " ";
+			}
+			for (int j = 0; j < 3; j++)
+			{
+				cout << game[x][7]->Print(i, j) << " ";
+			}
+			for (int k = 0; k < 3; k++)
+			{
+				cout << game[x][8]->Print(i, k) << " ";
+			}
+		}
+	}
+*/
+
+
+	void Unpassable()	//Sets square to unpassable values
+	{
+		for (int x = 0; x < 3; x++)
+		{
+			for (int y = 0; y < 3; y++)
+			{
+				square[x][y] = 0;
+			}
+		}
+	}
+	bool IsPassable()
+	{
+		if (square[0][0] == 1)
+		{ 
+			return true;
+			cout << "Is passable..." << endl;
+		}
+			
+		else
+			return false;
+	}
+	void Player()		//Sets the players position
+	{
+		for (int x = 0; x < 3; x++)
+		{
+			for (int y = 0; y < 3; y++)
+			{
+				square[x][y] = 1;
+			}
+		}
+		square[1][1] = 5;
+	}
+	void End()			//Sets the goal position
+	{
+		for (int x = 0; x < 3; x++)
+		{
+			for (int y = 0; y < 3; y++)
+			{
+				square[x][y] = 1;
+			}
+		}
+		square[1][1] = 20;
+	}
+	//Returns character intepreted by value in block. #-unpassable .-passable P-player E-goal
+	char Print(int x, int y)
+	{
+		char c = 't';
+		int value = square[x][y];
+		if (value == 0)
+		{
+			c = '#';
+		}
+		else if (value == 5)
+		{
+			c = 'P';
+		}
+		else if (value == 20)
+		{
+			c = 'E';
+		}
+		else
+		{
+			c = '.';
+		}
+		return c;
+	}
