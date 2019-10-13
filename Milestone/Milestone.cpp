@@ -9,7 +9,7 @@ using namespace std;
 /*
 	Matthew T Baker
 	CST-201
-	September 22, 2019
+	October 13, 2019
 	Dominga Gardner
 */
 
@@ -29,6 +29,49 @@ public:
 		Down = false;
 	}
 };
+
+class Heap_Path
+{
+public:
+	int moveNumber;
+	int movePosition;
+
+	Heap_Path()
+	{
+		moveNumber = 0;
+		movePosition = 0;
+	}
+};
+
+void Heapify(Heap_Path arr[], int size, int index)
+{
+	int max = index;
+	int left = 2 * index + 1;
+	int right = 2 * index + 2;
+
+	if (left < size && arr[left].movePosition > arr[max].movePosition)
+	{
+		max = left;
+	}
+	if (right < size && arr[right].movePosition > arr[max].movePosition)
+	{
+		max = right;
+	}
+	if (max != index)
+	{
+		swap(arr[index], arr[max]);
+		Heapify(arr, size, max);
+	}
+}
+
+void ConvertToHeap(Heap_Path arr[], int index)
+{
+	int i = (index / 2) - 1;
+	for (int x = i; x >= 0; x--)
+	{
+		Heapify(arr, index, i);
+	}
+}
 
 class GamePiece
 {
@@ -505,6 +548,7 @@ public:
 					cout << path.top() << " <- ";
 					path.pop();
 				}
+				cout << "\n";
 				return true;
 			}
 			else if ((isPassable(Find_POS(path_value + 1))) && (path_taken[path_value].Right == false) && (last_move != 3))
@@ -614,10 +658,228 @@ public:
 	}
 	bool FindUsingHeap(int start, int end)
 	{
+		// Up = -9 places in list
+		// Right = +1 places in list
+		// Down = +9 places in list
+		// Left = -1 places in list
 
+		Heap_Path hp[125];
+		int moveNumber = 1;
+		int path_value = start;
+		hp[moveNumber - 1].movePosition = path_value;
+		hp[moveNumber - 1].moveNumber = moveNumber;
+
+		int last_move = 0;		// 1 = Down; 2 = Right; 3 = Left; 4 = Up;
+		DirectionTaken path_taken[125];
+		bool solvable = false;
+		do
+		{
+			if (Find_POS(hp[moveNumber - 1].movePosition)->square[1][1] == 20)
+			{
+				cout << "Solution found...\n";
+				solvable = true;
+				cout << "Start at position: " << start << endl;
+				for (int x = 1; x < moveNumber; x++)
+				{
+					cout << "Move " << x << " to " << hp[x].movePosition << endl;
+				}
+				cout << "\n";
+				int n = sizeof(hp) / sizeof(hp[0]);
+				ConvertToHeap(hp, n);
+				cout << "After conversion to Heap: " << endl;
+				for (int x = 1; x < moveNumber; x++)
+				{
+					cout << "Move " << x << " to " << hp[x].movePosition << endl;
+				}
+				return true;
+			}
+			else if ((isPassable(Find_POS(path_value + 1))) && (path_taken[path_value].Right == false) && (last_move != 3))
+			{
+				path_taken[path_value].Right = true;
+				path_value += 1;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 2;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else if ((isPassable(Find_POS(path_value + 11))) && (path_taken[path_value].Down == false) && (last_move != 4))
+			{
+				path_taken[path_value].Down = true;
+				path_value += 11;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 1;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else if ((isPassable(Find_POS(path_value - 1))) && (path_taken[path_value].Left == false) && (last_move != 2))
+			{
+				path_taken[path_value].Left = true;
+				path_value -= 1;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 3;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else if ((isPassable(Find_POS(path_value - 11))) && (path_taken[path_value].Up == false) && (last_move != 1))
+			{
+				path_taken[path_value].Up = true;
+				path_value = path_value - 11;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 4;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else if ((isPassable(Find_POS(path_value + 11))) && (path_taken[path_value].Down == false))
+			{
+				path_taken[path_value].Down = true;
+				path_value += 11;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 1;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else if ((isPassable(Find_POS(path_value + 1))) && (path_taken[path_value].Right == false))
+			{
+				path_taken[path_value].Right = true;
+				path_value += 1;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 2;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else if ((isPassable(Find_POS(path_value - 1))) && (path_taken[path_value].Left == false))
+			{
+				path_taken[path_value].Left = true;
+				path_value -= 1;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 3;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else if ((isPassable(Find_POS(path_value - 11))) && (path_taken[path_value].Up == false))
+			{
+				path_taken[path_value].Up = true;
+				path_value = path_value - 11;
+				hp[moveNumber].movePosition = path_value;
+				last_move = 4;
+				moveNumber++;
+				hp[moveNumber].moveNumber = moveNumber;
+			}
+			else
+			{
+				cout << "No direction available" << endl;
+				solvable = true;
+			}
+		} while (!solvable);
+		return false;
+	}
+	bool FindUsingBFS(int start, int end, int last)
+	{
+		// Up = -9 places in list
+		// Right = +1 places in list
+		// Down = +9 places in list
+		// Left = -1 places in list
+
+		queue<GamePiece*> path;
+		queue<int> solution;
+		GamePiece* temp = new GamePiece();
+
+		temp = Find_POS(start);
+		//temp = Shortcut(temp);
+		int path_value = start;
+		int last_move = last;		// 1 = Down; 2 = Right; 3 = Left; 4 = Up;
+		path.push(temp);
+		DirectionTaken path_taken[125];
+		solution.push(path_value);
+
+		do
+		{
+			if (path.back()->square[1][1] == 20)
+			{
+				cout << "\nSolution found...\n";
+				return true;
+			}
+			else
+			{
+				path.pop();
+				if (isPassable(Find_POS(start + 1)) && (path_taken[path_value].Right == false) && (last_move != 3))
+				{
+					cout << start << " to " << start + 1 << "\n";
+					FindUsingBFS(start + 1, end, 2);
+				}
+				if (isPassable(Find_POS(start - 1)) && (path_taken[path_value].Left == false) && (last_move != 2))
+				{
+					cout << start << " to " << start - 1 << "\n";
+					FindUsingBFS(start - 1, end, 3);
+				}
+				if (isPassable(Find_POS(start + 11)) && (path_taken[path_value].Down == false) && (last_move != 4))
+				{
+					cout << start << " to " << start + 11 << "\n";
+					FindUsingBFS(start + 11, end, 1);
+				}
+				if (isPassable(Find_POS(start - 11)) && (path_taken[path_value].Up == false) && (last_move != 1))
+				{
+					cout << start << " to " << start - 11 << "\n";
+					FindUsingBFS(start - 11, end, 4);
+				}
+			}
+		} while (!path.empty());
+		return false;
+	}
+	bool FindUsingDFS(int start, int end, int last)
+	{
+		// Up = -9 places in list
+		// Right = +1 places in list
+		// Down = +9 places in list
+		// Left = -1 places in list
+
+		stack<GamePiece*> path;
+		queue<int> solution;
+		GamePiece* temp = new GamePiece();
+
+		temp = Find_POS(start);
+		//temp = Shortcut(temp);
+		int path_value = start;
+		int last_move = last;		// 1 = Down; 2 = Right; 3 = Left; 4 = Up;
+		path.push(temp);
+		DirectionTaken path_taken[125];
+		solution.push(path_value);
+
+		do
+		{
+			if (path.top()->square[1][1] == 20)
+			{
+				cout << "\nSolution found...\n";
+				return true;
+			}
+			else
+			{
+				path.pop();
+				if (isPassable(Find_POS(start + 1)) && (path_taken[path_value].Right == false) && (last_move != 3))
+				{
+					cout << start << " to " << start + 1 << "\n";
+					FindUsingDFS(start + 1, end, 2);
+				}
+				if (isPassable(Find_POS(start - 1)) && (path_taken[path_value].Left == false) && (last_move != 2))
+				{
+					cout << start << " to " << start - 1 << "\n";
+					FindUsingDFS(start - 1, end, 3);
+				}
+				if (isPassable(Find_POS(start + 11)) && (path_taken[path_value].Down == false) && (last_move != 4))
+				{
+					cout << start << " to " << start + 11 << "\n";
+					FindUsingDFS(start + 11, end, 1);
+				}
+				if (isPassable(Find_POS(start - 11)) && (path_taken[path_value].Up == false) && (last_move != 1))
+				{
+					cout << start << " to " << start - 11 << "\n";
+					FindUsingDFS(start - 11, end, 4);
+				}
+			}
+		} while (!path.empty());
+		return false;
 	}
 };
-
 int main()
 {
 	GameBoard gb;
@@ -626,7 +888,7 @@ int main()
 		gb.Add_Piece();
 	}
 
-	cout << "Game initialized...\n"; 
+	cout << "Game initialized...\n";
 
 	//Gets all passing blocks from txt file
 	ifstream passing_blocks;
@@ -654,8 +916,6 @@ int main()
 
 	GamePiece* plyr = gb.Find_POS(c);
 	GamePiece* _end = gb.Find_POS(d);
-	GamePiece* test1 = gb.Find_POS(120);
-	GamePiece* test2 = gb.Find_POS(0);
 	cout << c << " = starting POS\n";
 
 	cout << "Finding path using QUEUES...\n";
@@ -664,6 +924,13 @@ int main()
 	cout << "Finding path using STACK...\n";
 	gb.Find_Path(plyr, c, d); 
 	
+	cout << "Finding path using HEAP...\n";
+	gb.FindUsingHeap(c, d);
 
+	cout << "Finding path using BFS...\n";
+	gb.FindUsingBFS(c, d, NULL);
+
+	cout << "Finding path using DFS...\n";
+	gb.FindUsingDFS(c, d, NULL);
 	return 0;
 }
